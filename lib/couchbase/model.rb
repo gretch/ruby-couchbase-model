@@ -801,6 +801,8 @@ module Couchbase
           end
         EOC
       end
+
+      include ActiveModel::Validations::Callbacks
     end
 
     # Redefine (if exists) #to_key to use #key if #id is missing
