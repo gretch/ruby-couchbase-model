@@ -85,7 +85,7 @@ module Couchbase
                   now = Time.now.utc
                   prefix = now.to_i * 1_000_000 + now.usec
                   tail = next_number_seq
-                  (1..count).map{ "#{prefix}#{rand_number(count)}#{tail} }
+                  (1..count).map{ "#{prefix}#{rand_number(count)}#{tail}" }
                 else
                   raise ArgumentError, "Unknown algorithm #{algo}. Should be one :sequential, :random, :utc_random or :random_number"
                 end
@@ -112,7 +112,7 @@ module Couchbase
             @inc = rand(0xfff) + 1
           end
           @inc += rand(0xfff) + 1
-          @prefix + @inc
+          @prefix.to_i + @inc
         end
       end
 
