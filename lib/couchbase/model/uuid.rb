@@ -81,8 +81,13 @@ module Couchbase
                   end
                 when :sequential
                   (1..count).map{ next_seq }
+                when :random_number
+                  now = Time.now.utc
+                  prefix = now.to_i * 1_000_000 + now.usec
+                  tail = next_number_seq
+                  (1..count).map{ "#{prefix}#{rand_number(count)}#{tail} }
                 else
-                  raise ArgumentError, "Unknown algorithm #{algo}. Should be one :sequential, :random or :utc_random"
+                  raise ArgumentError, "Unknown algorithm #{algo}. Should be one :sequential, :random, :utc_random or :random_number"
                 end
         uuids.size == 1 ? uuids[0] : uuids
       end
@@ -98,6 +103,23 @@ module Couchbase
           @inc += rand(0xfff) + 1
           "%s%06x" % [@prefix, @inc]
         end
+      end
+
+      def next_number_seq(count)
+        @lock.synchronize do
+          if @inc >= 0xfff000
+            @prefix, _ = rand_bytes(13)
+            @inc = rand(0xfff) + 1
+          end
+          @inc += rand(0xfff) + 1
+          @prefix + @inc
+        end
+      end
+
+      def rand_number(count)
+        num = 0
+        count.times { num + rand(256) }
+        num
       end
 
       def rand_bytes(count)
